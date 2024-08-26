@@ -36,6 +36,7 @@ public class SitemapHostNote implements BurpExtension, ContextMenuItemsProvider 
     @Override
     public void initialize(MontoyaApi montoyaApi) {
         montoya = montoyaApi;
+        montoyaApi.extension().setName("SitemapHostNote");
         // register our context menu, created in provideMenuItems()
         montoyaApi.userInterface().registerContextMenuItemsProvider(this);
         // Leveraging my Burp GUI lib we find all JTabbedPanes underneath the root Frame
@@ -120,15 +121,21 @@ public class SitemapHostNote implements BurpExtension, ContextMenuItemsProvider 
                                                             montoya.userInterface().swingUtils().suiteFrame(),
                                                             "Enter note:",
                                                             userObjectHostUrl.substring(noteSpaceIndex+1).replace("(","").replace(")",""));
-                                                    // if the String field contains a space then we have a note already on this host
                                                     String hostString = userObjectHostUrl.substring(0, noteSpaceIndex);
-                                                    userObjectSuperClassField.set(userObjectFieldValue, hostString + " (" + noteText + ")");
+                                                    if(!noteText.isEmpty()) {
+                                                        // if the String field contains a space then we have a note already on this host
+                                                        userObjectSuperClassField.set(userObjectFieldValue, hostString + " (" + noteText + ")");
+                                                    } else {
+                                                        userObjectSuperClassField.set(userObjectFieldValue, hostString);
+                                                    }
                                                 } else {
                                                     String noteText = JOptionPane.showInputDialog(
                                                             montoya.userInterface().swingUtils().suiteFrame(),
                                                             "Enter note:");
                                                     // if the String field has no space then it's the first note
-                                                    userObjectSuperClassField.set(userObjectFieldValue, userObjectHostUrl + " (" + noteText + ")");
+                                                    if(!noteText.isEmpty()) {
+                                                        userObjectSuperClassField.set(userObjectFieldValue, userObjectHostUrl + " (" + noteText + ")");
+                                                    }
                                                 }
                                                 // quit searching
                                                 break DONE;
